@@ -1,4 +1,4 @@
-name: Deploy with Rollback
+name: Compile and deploy
 
 on:
   push:
