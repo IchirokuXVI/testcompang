@@ -36,5 +36,5 @@ jobs:
           cd ~/testcompang
           npm install
           npx ng build --configuration=production
-          rsync -av --delete-after ~/testcompang/* /var/www/html/testcompang
+          rsync -av --delete-after ~/testcompang/dist/testcompang/* /var/www/html/testcompang
         EOF
