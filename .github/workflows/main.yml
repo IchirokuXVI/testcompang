@@ -34,6 +34,8 @@ jobs:
       run: |
         ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd ~/testcompang
+          pwd
+          ls -l
           npm install
           npx ng build --configuration=production
           rsync -av --delete-after ~/testcompang/dist/testcompang/* /var/www/html/testcompang
