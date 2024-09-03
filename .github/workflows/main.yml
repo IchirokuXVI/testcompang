@@ -26,12 +26,15 @@ jobs:
           cp -r /var/www/html/testcompang ~/testcompang-$(date +%F-%T) 2>/dev/null || :
         EOF
 
-    - name: Build the project
+    - name: Sync changes to server
       run: |
-        npm install
-        ls -l
-        npx ng build --configuration=production
+        rsync -avz --delete-after ./dist/testcompang ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:~/testcompang
 
-    - name: Deploy to server
+    - name: Build the project and deploy
       run: |
-        rsync -avz --delete-after ./dist/ ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/www/html/
+        ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd ~/testcompang
+          npm install
+          npx ng build --configuration=production
+          rsync -av --delete-after ~/testcompang /var/www/html/testcompang
+        EOF
