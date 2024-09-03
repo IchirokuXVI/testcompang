@@ -28,6 +28,10 @@ jobs:
 
     - name: Sync changes to server
       run: |
+        ls -l
+        cd ./dist
+        ls -l
+        cd ..
         rsync -avz --delete-after ./dist/testcompang ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:~/testcompang
 
     - name: Build the project and deploy
