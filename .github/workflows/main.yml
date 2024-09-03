@@ -15,7 +15,6 @@ jobs:
 
     - name: Set up SSH agent
       run: |
-        mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
@@ -24,7 +23,6 @@ jobs:
 
     - name: Add server to known_hosts
       run: |
-        mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
     - name: Backup current version
@@ -36,7 +34,10 @@ jobs:
     - name: Deploy new version
       run: |
         ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << 'EOF'
+          mkdir -p ~/testcompang
           cd ~/testcompang
+          git init
+          git remote add origin https://github.com/IchirokuXVI/testcompang.git
           git pull origin main
           npm install
           ng build --configuration=production
