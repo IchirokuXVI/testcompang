@@ -10,21 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up SSH agent
-      run: |
-        mkdir ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-
-    - name: Add server to known_hosts
-      run: |
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+    - uses: actions/checkout@v4
+    # Make sure the @v0.9.0 matches the current version of the action
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Backup current version
       run: |
@@ -32,16 +22,11 @@ jobs:
           cp -r /var/www/html/testcompang ~/testcompang-$(date +%F-%T)
         EOF
 
-    - name: Deploy new version
+    - name: Build the project
       run: |
-        ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << 'EOF'
-          mkdir -p ~/testcompang
-          cd ~/testcompang
-          git init
-          git remote add origin https://github.com/IchirokuXVI/testcompang.git
-          git pull origin main
-          npm install
-          ng build --configuration=production
-          rm -r /var/www/html/testcompang
-          mv /dist/* /var/www/html/testcompang
-        EOF
+        npm install
+        ng build --configuration=production
+
+    - name: Deploy to server
+      run: |
+        rsync -avz --delete-after ./dist/ ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/www/html/testcompang/
