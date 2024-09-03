@@ -23,7 +23,7 @@ jobs:
     - name: Backup current version
       run: |
         ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cp -r /var/www/html/testcompang ~/testcompang-$(date +%F-%T)
+          cp -r /var/www/html/testcompang ~/testcompang-$(date +%F-%T) 2>/dev/null || :
         EOF
 
     - name: Build the project
