@@ -29,7 +29,8 @@ jobs:
     - name: Build the project
       run: |
         npm install
-        ng build --configuration=production
+        ls -l
+        npx ng build --configuration=production
 
     - name: Deploy to server
       run: |
